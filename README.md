@@ -5,6 +5,7 @@ GMO MakeShop、カラーミーショップのデザインテンプレート開�
 ## セットアップ
 
 ```
+$ git clone https://github.com/do-mu-oi/makeshop-smarty.git
 $ cd makeshop-smarty/
 $ docker-compose up
 ```
@@ -17,25 +18,23 @@ localhost:8080 でアクセス
 
 ```bash
 $ docker exec -it makeshop-smarty_php_1 bash
+# コンテナ実行ユーザー 1000:1000 の場合
 $ usermod -u 1000 www-data ; groupmod -g 1000 www-data ; /etc/init.d/apache2 reload
 ```
 
 ## ディレクトリ構成
 
-`html`ディレクトリ内に`theme`ディレクトリを作成し、データファイル(.json)、テンプレート(.tpl)を配置します。
+`html/theme/data/`以下にデータファイル(.json)、`html/theme/templates/`以下にテンプレートファイル(.tpl)を配置します。
 
-- app/
-- html/
+- html/ : Apache document root
   - **theme/**
-    - assets/
-      - style.css
     - **data/** : テンプレートから呼び出すデータ
       - data1.json
       - data2.json
       - data3.json
       - ...
     - **templates/** : テンプレートファイル
-      - module/ : モジュール (テンプレートから`{$module.header}`等で呼び出し可能)
+      - module/ : モジュール (テンプレートから`{$module.header}`等で呼び出し)
         - header.tpl
         - footer.tpl
         - side_bar.tpl
@@ -44,15 +43,12 @@ $ usermod -u 1000 www-data ; groupmod -g 1000 www-data ; /etc/init.d/apache2 rel
       - page2.tpl
       - page2.tpl
       - ...
-  - .htaccess
-  - index.php
-  - makeshop.php
 
-`theme/`以下のファイルには`/`でアクセス可能です。
+`theme/`以下のファイルには`/`以下でアクセス可能です。(例: `theme/assets/style.css` -> `/assets/style.css`)
 
 ## サンプル
 
-### データファイル (data.json)
+### データファイル (html/theme/data/data.json)
 
 ```json
 {
@@ -66,7 +62,30 @@ $ usermod -u 1000 www-data ; groupmod -g 1000 www-data ; /etc/init.d/apache2 rel
 }
 ```
 
-### テンプレート (top.tpl)
+上記pageとshopは別ファイルに分割することも出来ます。
+
+#### data1.json
+
+```json
+{
+  "page": {
+    "title": "デザインテンプレート開発環境",
+    "css": "/assets/style.css"
+  }
+}
+```
+
+#### data2.json
+
+```json
+{
+  "shop": {
+    "name": "ショップ名"
+  }
+}
+```
+
+### テンプレート (html/theme/templates/top.tpl)
 
 ```html
 <!DOCTYPE html>
@@ -77,10 +96,16 @@ $ usermod -u 1000 www-data ; groupmod -g 1000 www-data ; /etc/init.d/apache2 rel
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="<{$page.css}>" />
   </head>
-  <body></body>
+  <body><{$module.header}></body>
 </html>
+```
+
+### テンプレートモジュール (html/theme/templates/module/header.tpl)
+
+```html
+<h1><{$shop.name}></h1>
 ```
 
 ## License
 
-MIT
+MIT License
