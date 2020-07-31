@@ -1,7 +1,7 @@
 version: "3"
 services:
   php:
-    image: php:7.3-apache
+    build: .
     volumes:
       - ./html:/var/www/html
       - ./app:/app
